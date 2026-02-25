@@ -81,9 +81,10 @@ PR #2에서 수정한 핵심 사항:
 
 ### 시나리오 5: Optimize Imports — 중복 transitive import 방지
 
-> Import chain: `A.sol → B.sol → C.sol` (C.sol이 `Initializable` 정의)
+> `A.sol`이 `B`와 `Initializable` 모두 상속. Import chain: `A.sol → B.sol → C.sol` (C.sol이 `Initializable` 정의)
 
 - [ ] `src/A.sol` 열고 Optimize Imports 실행 (Ctrl+Alt+O / Cmd+Alt+O)
+- [ ] `import "./B.sol";`이 유지됨 (A가 B를 직접 사용)
 - [ ] `import "./C.sol";`이 **추가되지 않음** (Initializable은 B→C로 이미 도달 가능)
 - [ ] Optimize Imports 재실행 시 import가 변하지 않음 (oscillation 없음)
 

@@ -6,7 +6,7 @@
 
 ```
 ├── remappings.txt                      # (empty)
-├── src/A.sol                           # import "./B.sol"; contract A is Initializable {}
+├── src/A.sol                           # import "./B.sol"; contract A is B, Initializable {}
 ├── src/B.sol                           # import "./C.sol"; contract B {}
 ├── src/C.sol                           # contract Initializable {}
 └── README.md
@@ -18,7 +18,7 @@
 A.sol → B.sol → C.sol (defines Initializable)
 ```
 
-`A.sol` uses `Initializable` which is defined in `C.sol`, but `C.sol` is already reachable transitively via `B.sol`.
+`A.sol` inherits from both `B` (defined in `B.sol`) and `Initializable` (defined in `C.sol`). Since `B.sol` imports `C.sol`, `Initializable` is already reachable transitively — no direct `import "./C.sol";` should be added.
 
 ## Test Procedure
 

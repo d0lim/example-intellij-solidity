@@ -82,9 +82,10 @@ Key fixes in PR #2:
 
 ### Scenario 5: Optimize Imports — No Duplicate Transitive Imports
 
-> Import chain: `A.sol -> B.sol -> C.sol` (C.sol defines `Initializable`)
+> `A.sol` inherits both `B` and `Initializable`. Import chain: `A.sol -> B.sol -> C.sol` (C.sol defines `Initializable`)
 
 - [ ] Open `src/A.sol` and run Optimize Imports (Ctrl+Alt+O / Cmd+Alt+O)
+- [ ] `import "./B.sol";` is kept (A uses B directly)
 - [ ] `import "./C.sol";` is **NOT** added (Initializable is already reachable via B -> C)
 - [ ] Running Optimize Imports again keeps imports stable (no oscillation)
 
