@@ -81,11 +81,11 @@ PR #2에서 수정한 핵심 사항:
 
 ### 시나리오 5: Optimize Imports — 중복 transitive import 방지
 
-> `A.sol`이 `B`와 `Initializable` 모두 상속. Import chain: `A.sol → B.sol → C.sol` (C.sol이 `Initializable` 정의)
+> `Initializable`가 두 경로에 존재: `contracts-upgradeable/.../Initializable.sol` (직접 import) + `upgrades-core/.../Initializable.sol` (transitive)
 
-- [ ] `src/A.sol` 열고 Optimize Imports 실행 (Ctrl+Alt+O / Cmd+Alt+O)
-- [ ] `import "./B.sol";`이 유지됨 (A가 B를 직접 사용)
-- [ ] `import "./C.sol";`이 **추가되지 않음** (Initializable은 B→C로 이미 도달 가능)
+- [ ] `src/MyCoin.sol` 열고 Optimize Imports 실행 (Ctrl+Alt+O / Cmd+Alt+O)
+- [ ] import가 정확히 2개 유지됨 (OwnableUpgradeable + contracts-upgradeable의 Initializable)
+- [ ] `upgrades-core/contracts/Initializable.sol`이 중복 import로 **추가되지 않음**
 - [ ] Optimize Imports 재실행 시 import가 변하지 않음 (oscillation 없음)
 
 ### 시나리오 6: 혼합 리매핑 소스

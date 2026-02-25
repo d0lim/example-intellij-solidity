@@ -82,11 +82,11 @@ Key fixes in PR #2:
 
 ### Scenario 5: Optimize Imports — No Duplicate Transitive Imports
 
-> `A.sol` inherits both `B` and `Initializable`. Import chain: `A.sol -> B.sol -> C.sol` (C.sol defines `Initializable`)
+> `Initializable` exists at two paths: `contracts-upgradeable/.../Initializable.sol` (direct) and `upgrades-core/.../Initializable.sol` (transitive)
 
-- [ ] Open `src/A.sol` and run Optimize Imports (Ctrl+Alt+O / Cmd+Alt+O)
-- [ ] `import "./B.sol";` is kept (A uses B directly)
-- [ ] `import "./C.sol";` is **NOT** added (Initializable is already reachable via B -> C)
+- [ ] Open `src/MyCoin.sol` and run Optimize Imports (Ctrl+Alt+O / Cmd+Alt+O)
+- [ ] Exactly 2 imports remain (OwnableUpgradeable + Initializable from contracts-upgradeable)
+- [ ] `upgrades-core/contracts/Initializable.sol` is **NOT** added as a duplicate import
 - [ ] Running Optimize Imports again keeps imports stable (no oscillation)
 
 ### Scenario 6: Mixed Remapping Sources

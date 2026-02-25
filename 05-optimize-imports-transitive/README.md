@@ -1,37 +1,39 @@
 # Scenario 5: Optimize Imports — No Duplicate Transitive Imports
 
-**Tests:** Running Optimize Imports does not add redundant transitive import statements.
+**Tests:** Running Optimize Imports does not add a redundant transitive import when the same-named symbol exists at multiple paths.
 
 ## File Structure
 
 ```
 ├── remappings.txt                      # (empty)
-├── src/A.sol                           # import "./B.sol"; contract A is B, Initializable {}
-├── src/B.sol                           # import "./C.sol"; contract B {}
-├── src/C.sol                           # contract Initializable {}
+├── openzeppelin/
+│   ├── upgrades-core/contracts/Initializable.sol        # Initializable (transitive)
+│   └── contracts-upgradeable/
+│       ├── proxy/utils/Initializable.sol                # Initializable (direct import)
+│       └── access/OwnableUpgradeable.sol
+├── src/MyCoin.sol
 └── README.md
 ```
 
-## Import Chain
+## The Problem (Issue #453)
 
-```
-A.sol → B.sol → C.sol (defines Initializable)
-```
+`Initializable` exists at **two paths**:
+- `contracts-upgradeable/proxy/utils/Initializable.sol` — directly imported
+- `upgrades-core/contracts/Initializable.sol` — reachable transitively (the deprecated path)
 
-`A.sol` inherits from both `B` (defined in `B.sol`) and `Initializable` (defined in `C.sol`). Since `B.sol` imports `C.sol`, `Initializable` is already reachable transitively — no direct `import "./C.sol";` should be added.
+Before the fix, Optimize Imports would add a **second** `import {Initializable}` from the transitive path, causing a duplicate import and build failure.
 
 ## Test Procedure
 
 1. Open this directory as a project in IntelliJ with the plugin installed
-2. Open `src/A.sol`
+2. Open `src/MyCoin.sol`
 3. Run Optimize Imports (Ctrl+Alt+O / Cmd+Alt+O on macOS)
-4. **Expected:** No new `import "./C.sol";` is added — `Initializable` is already reachable via `B.sol → C.sol`
-5. Run Optimize Imports again
-6. **Expected:** Imports remain stable (no oscillation — imports don't keep changing)
-
-## Key Detail
-
-Before the fix (integrating `preferElementsFromDirectImports()`), the optimizer would add `import "./C.sol";` because it didn't recognize that `Initializable` was already reachable transitively.
+4. **Expected:** Exactly 2 import statements remain:
+   - `import "../openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";`
+   - `import "../openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";`
+5. **Expected:** `upgrades-core/contracts/Initializable.sol` is **NOT** added as a duplicate import
+6. Run Optimize Imports again
+7. **Expected:** Imports remain stable (no oscillation)
 
 ## Related
 
